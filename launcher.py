@@ -20,6 +20,10 @@ else:
 def gen_launcher_command(settings):
 	exe_path=settings['path']
 
+	#Deal with running on a mac part 1
+	if settings['is_mac'].strip() == 'True':
+		exe_path = join_path(exe_path,'Contents/Resources/transgaming/c_drive/ffxiv/')
+
 	if(settings['use_dx11'].strip() == 'True'):
 		exe_path = join_path(exe_path,'game/ffxiv_dx11.exe')
 	else:
@@ -35,6 +39,12 @@ def gen_launcher_command(settings):
 		'DEV.MaxEntitledExpansionID='+settings['expansion_id'],
 		'SYS.Region='+settings['region'],
 		'ver='+settings['version']]
+
+	#Deal with running on a mac part 2
+	if settings['is_mac'].strip() == 'True':
+		launcher_dict.insert(1,join_path(settings['path'],'Contents/MacOS/FINALFANTASYXIV'))
+		launcher_dict.insert(2,'-cmdline')
+		launcher_dict.append(exe_path)
 
 	#Deal with pre_command (NOT Running on windows)
 	if settings['pre_command'].strip() != '':
