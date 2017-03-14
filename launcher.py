@@ -18,7 +18,7 @@ else:
 	from ConfigParser import ConfigParser
 
 def gen_launcher_command(settings):
-	exe_path=settings['path']
+	exe_path=get_ffxiv_path(settings)
 
 	if(settings['use_dx11'].strip() == 'True'):
 		exe_path = join_path(exe_path,'game/ffxiv_dx11.exe')
@@ -36,15 +36,30 @@ def gen_launcher_command(settings):
 		'SYS.Region='+settings['region'],
 		'ver='+settings['version']]
 
+	# Deal with macOS
+	if (settings['mac_app'] != ''):
+		# Truncate the extraneous exe_path from the existing launcher_dict
+		launcher_dict = launcher_dict[1:]
+		# Path to the cider launcher
+		cider_bin = join_path(settings['mac_app'], 'Contents/MacOS/FINALFANTASYXIV')
+		cmdline = ' '.join(launcher_dict)
+		launcher_dict = [cider_bin, '-cmdline', cmdline, exe_path]
+
 	#Deal with pre_command (NOT Running on windows)
 	if settings['pre_command'].strip() != '':
 		launcher_dict.insert(0,settings['pre_command'].strip())
 
 	return launcher_dict
 
+def get_ffxiv_path(settings):
+	if (settings['mac_app'] != ''):
+		return join_path(settings['mac_app'], 'Contents/Resources/transgaming/c_drive/ffxiv/')
+	else:
+		return settings['path']
+
 def run(settings):
 	sid=login(settings['region'],settings['user'],settings['password'],settings['one_time_password'])
-	(settings['actual_sid'],settings['version']) = get_actual_sid(sid,settings['path'])
+	(settings['actual_sid'],settings['version']) = get_actual_sid(sid, get_ffxiv_path(settings))
 	launch = gen_launcher_command(settings)
 	for i in launch:
 		print(i,end=' ')
