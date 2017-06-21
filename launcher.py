@@ -123,8 +123,11 @@ class gui_prompt:
 		self.top.bind('<Return>', lambda _: self.OK.invoke())
 		self.top.bind('<KP_Enter>', lambda _: self.OK.invoke())
 
-		#Place window in center of screen
-		self.top.eval('tk::PlaceWindow %s center' % self.top.winfo_pathname(self.top.winfo_id()))
+		#Place window in center of screen (on windows, this doesn't work, and causes an exception)
+		try:
+			self.top.eval('tk::PlaceWindow %s center' % self.top.winfo_pathname(self.top.winfo_id()))
+		except:
+			pass
 		#Focus on the one time password box at start
 		self.E3.focus()
 		self.top.title("FFXIV Launcher")
